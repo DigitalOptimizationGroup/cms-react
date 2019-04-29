@@ -3,18 +3,9 @@ import { Context } from "./Context";
 
 export const trackPathChange = WrappedComponent => {
   class TrackPathChange extends React.Component {
-    componentDidMount() {
-      this.props.pathChange(this.props.path);
-    }
-
-    componentWillReceiveProps(nextProps) {
-      if (this.props.path !== nextProps.path) {
-        this.props.pathChange(this.props.path);
-      }
-    }
-
     render() {
-      return <WrappedComponent {...this.props} />;
+      const { pathChange, ...props } = this.props;
+      return <WrappedComponent trackPathChange={pathChange} {...props} />;
     }
   }
   return props => (

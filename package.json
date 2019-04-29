@@ -2,7 +2,7 @@
   "name": "@digitaloptgroup/cms-react",
   "version": "0.0.1-pre-release.4",
   "description": "React SDK for Digital Optimization Group's Headless A/B Testing CMS",
-  "repository": "https://github.com/DigitalOptGroup/cms-react.git",
+  "repository": "https://github.com/DigitalOptimizationGroup/cms-react.git",
   "main": "./lib/index.js",
   "scripts": {
     "test": "jest --watch",
@@ -12,8 +12,8 @@
   "author": "Digital Optimization Group LLC",
   "license": "MIT",
   "dependencies": {
-    "@digitaloptgroup/analytics": "../analytics",
-    "@digitaloptgroup/cms": "../cms",
+    "@digitaloptgroup/analytics": "0.0.1-pre-release.1",
+    "@digitaloptgroup/cms": "0.0.1-pre-release.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "rxjs": "^6.4.0"
