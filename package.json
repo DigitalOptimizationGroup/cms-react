@@ -1,0 +1,41 @@
+{
+  "name": "@digitaloptgroup/cms-react",
+  "version": "0.0.1-pre-release.4",
+  "description": "React SDK for Digital Optimization Group's Headless A/B Testing CMS",
+  "repository": "https://github.com/DigitalOptGroup/cms-react.git",
+  "main": "./lib/index.js",
+  "scripts": {
+    "test": "jest --watch",
+    "build": "babel src -d lib --verbose;",
+    "watch": "babel src -d lib --watch --verbose;"
+  },
+  "author": "Digital Optimization Group LLC",
+  "license": "MIT",
+  "dependencies": {
+    "@digitaloptgroup/analytics": "../analytics",
+    "@digitaloptgroup/cms": "../cms",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "rxjs": "^6.4.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.2.0",
+    "@babel/core": "^7.0.0-beta.51",
+    "@babel/plugin-proposal-class-properties": "^7.0.0-beta.51",
+    "@babel/plugin-proposal-decorators": "^7.0.0-beta.51",
+    "@babel/plugin-proposal-export-default-from": "^7.2.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.4.3",
+    "@babel/plugin-syntax-dynamic-import": "^7.2.0",
+    "@babel/plugin-transform-object-assign": "^7.0.0-beta.51",
+    "@babel/plugin-transform-react-constant-elements": "^7.0.0-beta.51",
+    "@babel/plugin-transform-react-jsx": "^7.0.0-beta.51",
+    "@babel/preset-env": "^7.0.0-beta.51",
+    "@babel/register": "^7.0.0-beta.51",
+    "jest": "^24.7.1",
+    "mock-socket": "^8.0.5"
+  },
+  "sideEffects": false,
+  "files": [
+    "/lib"
+  ]
+}
