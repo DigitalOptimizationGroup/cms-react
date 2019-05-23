@@ -85,7 +85,10 @@ const MyComponent = componentExperiment(
     b: lazy(() => import("./BComponent"))
   },
   {
-    experimentName: "example"
+    experimentName: "example",
+    // optional loading Component passed into a <Suspense/> wrapper that is
+    // displayed while your component is loading
+    Loading: <div>Loading...</div>
   }
 );
 
@@ -170,3 +173,44 @@ function App() {
 
 export default App;
 ```
+
+## Advanced configuration
+
+Full configuration options for Component A/B testing.
+
+```js
+const MyComponent = componentExperiment(
+  {
+    a: lazy(() => import("./AComponent")),
+    b: lazy(() => import("./BComponent"))
+  },
+  {
+    queryName: "codeExperiment",
+    args: { experimentName: "example" },
+    field: "case",
+    wrappers: {
+      a: "span",
+      b: "h1"
+    },
+    wrapperProps: {
+      b: { style: { border: "5px solid red" } }
+    },
+    default: () => <div>Default</div>,
+    Loading: <div>Loading...</div>
+  }
+);
+```
+
+Server side data resolution and caching. If you are deploying your app into our Application Delivery Network you can provide a `routes.json` configuration file that will cache API data and inject into the page while still on the server. Completely eliminating client side data fetching latency.
+
+```json
+{
+  "/": [
+    { "queryName": "helloWorld", "args": {} }
+    { "queryName": "codeExperiment", "args": { "name": "example" } }]
+}
+```
+
+## Server side rendering
+
+If you'd like to do server side rendering just reach out to us.
