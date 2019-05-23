@@ -5,3 +5,4 @@ export { Trackers } from "./Trackers";
 export { Provider } from "./Provider";
 export { ProviderWithTracking } from "./ProviderWithTracking";
 export { TrackExposure } from "./TrackExposure";
+export { componentExperiment } from "./componentExperiment";

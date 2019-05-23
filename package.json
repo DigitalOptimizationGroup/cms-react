@@ -1,6 +1,6 @@
 {
   "name": "@digitaloptgroup/cms-react",
-  "version": "0.0.1-pre-release.4",
+  "version": "0.0.1-dev-preview.01",
   "description": "React SDK for Digital Optimization Group's Headless A/B Testing CMS",
   "repository": "https://github.com/DigitalOptimizationGroup/cms-react.git",
   "main": "./lib/index.js",
