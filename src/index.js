@@ -6,3 +6,4 @@ export { Provider } from "./Provider";
 export { ProviderWithTracking } from "./ProviderWithTracking";
 export { TrackExposure } from "./TrackExposure";
 export { componentExperiment } from "./componentExperiment";
+export { ListFeature } from "./ListFeature";

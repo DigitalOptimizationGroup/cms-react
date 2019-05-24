@@ -2,7 +2,7 @@ import * as React from "react";
 import { Context } from "./Context";
 import { TrackExposure } from "./TrackExposure";
 
-class ConnectFeature extends React.Component {
+class ConnectListFeature extends React.Component {
   state = {};
 
   componentDidMount() {
@@ -54,22 +54,23 @@ class ConnectFeature extends React.Component {
 
   render() {
     if ((this.state.feature || {})._ab !== undefined) {
-      // could render a not found component if passed in
-      return (
-        <TrackExposure _ab={(this.state.feature || { _ab: {} })._ab}>
-          {this.props.children((this.state.feature || {}).assignment || {})}
-        </TrackExposure>
-      );
+      return this.state.feature.assignment.map(({ assignment, _ab }) => {
+        return (
+          <TrackExposure _ab={_ab} key={_ab.variationId}>
+            {this.props.children(assignment)}
+          </TrackExposure>
+        );
+      });
     }
 
-    return this.props.children((this.state.feature || {}).assignment || {});
+    return null;
   }
 }
 
-export const Feature = props => (
+export const ListFeature = props => (
   <Context.Consumer>
     {({ cms }) => {
-      return <ConnectFeature cms={cms} {...props} />;
+      return <ConnectListFeature cms={cms} {...props} />;
     }}
   </Context.Consumer>
 );

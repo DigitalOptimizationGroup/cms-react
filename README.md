@@ -107,11 +107,11 @@ A/B testing lists of data structures.
 
 ```js
 import React, { Component } from "react";
-import { Feature, NestedFeature } from "@digitaloptgroup/cms-react";
+import { ListFeature, NestedFeature } from "@digitaloptgroup/cms-react";
 
-function NavItem({ feature }) {
+function MainNav() {
   return (
-    <NestedFeature feature={feature}>
+    <ListFeature queryName="mainNav">
       {({ text, path }) => {
         return (
           <div
@@ -123,23 +123,7 @@ function NavItem({ feature }) {
           </div>
         );
       }}
-    </NestedFeature>
-  );
-}
-
-function MainNav() {
-  return (
-    <Feature queryName="mainNav">
-      {({ feature }) => {
-        return (
-          <div>
-            {feature.map((item, i) => {
-              return <NavItem feature={item} key={i} />;
-            })}
-          </div>
-        );
-      }}
-    </Feature>
+    </ListFeature>
   );
 }
 
