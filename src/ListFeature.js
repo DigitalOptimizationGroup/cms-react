@@ -57,7 +57,7 @@ class ConnectListFeature extends React.Component {
       return this.state.feature.assignment.map(({ assignment, _ab }) => {
         return (
           <TrackExposure _ab={_ab} key={_ab.variationId}>
-            {this.props.children(assignment)}
+            {this.props.children({ ...assignment, _ab })}
           </TrackExposure>
         );
       });

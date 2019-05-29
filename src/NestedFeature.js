@@ -5,8 +5,11 @@ export class NestedFeature extends React.Component {
   render() {
     if ((this.props.feature || {})._ab !== undefined) {
       return (
-        <TrackExposure _ab={(this.props.feature || { _ab: {} })._ab}>
-          {this.props.children((this.props.feature || {}).assignment)}
+        <TrackExposure _ab={this.props.feature._ab}>
+          {this.props.children({
+            ...((this.props.feature || {}).assignment || {}),
+            _ab: this.props.feature._ab
+          })}
         </TrackExposure>
       );
     }
