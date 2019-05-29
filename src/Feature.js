@@ -21,6 +21,11 @@ class ConnectFeature extends React.Component {
       this.props.args !== nextProps.args ||
       this.props.cms !== nextProps.cms
     ) {
+      console.warn({
+        queryName: this.props.queryName,
+        args: this.props.args,
+        cms: this.props.cms
+      });
       this.subscription && this.subscription.unsubscribe();
       this.setState({ variationId: "", feature: {} });
       this.subscribeToFeature(nextProps);
