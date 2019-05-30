@@ -2,7 +2,7 @@ export { trackPathChange } from "./PathChange";
 export { Feature } from "./Feature";
 export { NestedFeature } from "./NestedFeature";
 export { trackers } from "./Trackers";
-export { Provider } from "./Provider";
+//export { Provider } from "./Provider";
 export { ProviderWithTracking } from "./ProviderWithTracking";
 export { TrackExposure } from "./TrackExposure";
 export { componentExperiment } from "./componentExperiment";

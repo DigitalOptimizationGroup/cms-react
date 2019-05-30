@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Context } from "./Context";
 import { TrackExposure } from "./TrackExposure";
+import { isArgsEqual } from "./isArgsEqual";
 
 class ConnectListFeature extends React.Component {
   state = {};
@@ -14,11 +15,12 @@ class ConnectListFeature extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    const { queryName, args, cms } = this.props;
     // this check allows the subscribed feature to change when the args change
     // such as by the url changing but the component still being mounted
     if (
       this.props.queryName !== nextProps.queryName ||
-      this.props.args !== nextProps.args ||
+      !isArgsEqual(args, nextProps.args) ||
       this.props.cms !== nextProps.cms
     ) {
       this.subscription && this.subscription.unsubscribe();
@@ -54,10 +56,14 @@ class ConnectListFeature extends React.Component {
 
   render() {
     if ((this.state.feature || {})._ab !== undefined) {
-      return this.state.feature.assignment.map(({ assignment, _ab }) => {
+      return this.state.feature.assignment.map(({ assignment, _ab }, i) => {
         return (
           <TrackExposure _ab={_ab} key={_ab.variationId}>
-            {this.props.children({ ...assignment, _ab })}
+            {this.props.children(
+              { ...assignment, _ab },
+              i,
+              this.state.feature.assignment
+            )}
           </TrackExposure>
         );
       });

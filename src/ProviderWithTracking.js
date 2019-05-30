@@ -1,91 +1,96 @@
 import * as React from "react";
 import { connect } from "@digitaloptgroup/cms";
 import { Context } from "./Context";
+//import { initTracker } from "@digitaloptgroup/analytics";
 
 export class ProviderWithTracking extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      observeStack: [],
-      pathChangeStack: [],
-      caughtErrorStack: [],
-      outcomeStack: []
-    };
+    this.state = {};
+    this.observeStack = [];
+    this.pathChangeStack = [];
+    this.caughtErrorStack = [];
+    this.outcomeStack = [];
   }
 
   componentDidMount() {
     const cms = connect({
-      projectId: this.props.projectId,
       apikey: this.props.apikey,
-      apiUrl: this.props.apiUrl
+      apiUrl: this.props.apiUrl,
+      vid: this.props.vid
     });
 
     this.setState({
       cms
     });
 
-    import("@digitaloptgroup/analytics")
-      .then(module => {
-        const { initTracker } = module;
-        const {
-          pathChange,
-          outcome,
-          caughtError,
-          initIntersectionObserver
-        } = initTracker(
-          {
-            rid: this.props.rid,
-            vid: this.props.vid,
-            projectId: this.props.projectId,
-            startTimestamp: this.props.startTimestamp,
-            apiKey: this.props.apiKey
-          },
-          this.props.wsFqdn
-        );
+    import("@digitaloptgroup/analytics").then(tracker => {
+      this.initTracker(tracker, this.props);
+    });
 
-        const { observe, unobserve } = initIntersectionObserver();
+    //    if(this.props.tracker)
+  }
 
-        this.state.observeStack.forEach(({ element, tracking }) => {
-          observe(element, tracking);
-        });
+  initTracker = (tracker, props) => {
+    const { initTracker } = tracker;
+    const {
+      pathChange,
+      outcome,
+      caughtError,
+      initIntersectionObserver
+    } = initTracker(
+      {
+        rid: props.rid,
+        vid: props.vid,
+        projectId: props.projectId,
+        startTimestamp: props.startTimestamp,
+        apiKey: props.apiKey
+      },
+      this.props.wsFqdn
+    );
 
-        this.state.pathChangeStack.forEach(pathname => {
-          pathChange(pathname);
-        });
+    const { observe, unobserve } = initIntersectionObserver();
 
-        this.state.outcomeStack.forEach(({ name, metadata }) => {
-          outcome(name, metadata);
-        });
+    while (this.observeStack.length > 0) {
+      const { element, tracking } = this.observeStack.shift();
+      observe(element, tracking);
+    }
 
-        this.state.caughtErrorStack.forEach(metadata => {
-          caughtError(metadata);
-        });
+    while (this.pathChangeStack.length > 0) {
+      const pathname = this.pathChangeStack.shift();
+      pathChange(pathname);
+    }
 
-        this.setState({
-          pathChange,
-          outcome,
-          caughtError,
-          observe,
-          unobserve,
-          observeStack: [],
-          pathChangeStack: [],
-          outcomeStack: [],
-          caughtErrorStack: []
-        });
-      })
-      .catch(e => {
-        // should send this error somewhere
-        console.log("failed importing", e);
-      });
+    while (this.outcomeStack.length > 0) {
+      const { name, metadata } = this.outcomeStack.shift();
+      outcome(name, metadata);
+    }
+
+    while (this.caughtErrorStack.length > 0) {
+      const metadata = this.caughtErrorStack.shift();
+      observe(metadata);
+    }
+
+    this.setState({
+      pathChange,
+      outcome,
+      caughtError,
+      observe,
+      unobserve
+    });
+  };
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.tracker !== this.props.tracker) {
+      this.initTracker(nextProps.tracker, nextProps);
+    }
   }
 
   observe = (element, tracking) => {
     if (this.state.observe) {
       this.state.observe(element, tracking);
     } else {
-      this.setState({
-        observeStack: [...this.state.observeStack, { element, tracking }]
-      });
+      this.observeStack.push({ element, tracking });
     }
   };
 
@@ -93,11 +98,9 @@ export class ProviderWithTracking extends React.Component {
     if (this.state.unobserve) {
       this.state.unobserve(element);
     } else {
-      this.setState({
-        observeStack: this.state.observeStack.filter(
-          variation => element !== variation.element
-        )
-      });
+      this.observeStack = this.observeStack.filter(
+        variation => element !== variation.element
+      );
     }
   };
 
@@ -105,9 +108,7 @@ export class ProviderWithTracking extends React.Component {
     if (this.state.pathChange) {
       this.state.pathChange(pathname);
     } else {
-      this.setState({
-        pathChangeStack: [...this.state.pathChangeStack, pathname]
-      });
+      this.pathChangeStack.push(pathname);
     }
   };
 
@@ -115,9 +116,7 @@ export class ProviderWithTracking extends React.Component {
     if (this.state.outcome) {
       this.state.outcome(name, metadata);
     } else {
-      this.setState({
-        outcomeStack: [...this.state.outcomeStack, { name, metadata }]
-      });
+      this.outcomeStack.push({ name, metadata });
     }
   };
 
@@ -125,9 +124,7 @@ export class ProviderWithTracking extends React.Component {
     if (this.state.caughtError) {
       this.state.caughtError(metadata);
     } else {
-      this.setState({
-        caughtErrorStack: [...this.state.caughtErrorStack, metadata]
-      });
+      this.caughtErrorStack.push(metadata);
     }
   };
 

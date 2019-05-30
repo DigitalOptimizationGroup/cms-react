@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Context } from "./Context";
 import { TrackExposure } from "./TrackExposure";
+import { isArgsEqual } from "./isArgsEqual";
 
 class ConnectFeature extends React.Component {
   state = {};
@@ -14,18 +15,14 @@ class ConnectFeature extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    const { queryName, args, cms } = this.props;
     // this check allows the subscribed feature to change when the args change
     // such as by the url changing but the component still being mounted
     if (
-      this.props.queryName !== nextProps.queryName ||
-      this.props.args !== nextProps.args ||
-      this.props.cms !== nextProps.cms
+      queryName !== nextProps.queryName ||
+      !isArgsEqual(args, nextProps.args) ||
+      cms !== nextProps.cms
     ) {
-      console.warn({
-        queryName: this.props.queryName,
-        args: this.props.args,
-        cms: this.props.cms
-      });
       this.subscription && this.subscription.unsubscribe();
       this.setState({ variationId: "", feature: {} });
       this.subscribeToFeature(nextProps);
@@ -74,10 +71,12 @@ class ConnectFeature extends React.Component {
   }
 }
 
-export const Feature = props => (
-  <Context.Consumer>
-    {({ cms }) => {
-      return <ConnectFeature cms={cms} {...props} />;
-    }}
-  </Context.Consumer>
-);
+export const Feature = props => {
+  return (
+    <Context.Consumer>
+      {({ cms }) => {
+        return <ConnectFeature cms={cms} {...props} />;
+      }}
+    </Context.Consumer>
+  );
+};

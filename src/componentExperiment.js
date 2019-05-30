@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Context } from "./Context";
 import { TrackExposure } from "./TrackExposure";
+import { isArgsEqual } from "./isArgsEqual";
 
 class ConnectComponentExperiment extends React.Component {
   state = {};
@@ -18,7 +19,7 @@ class ConnectComponentExperiment extends React.Component {
     // such as by the url changing but the component still being mounted
     if (
       this.props.config.queryName !== nextProps.config.queryName ||
-      this.props.config.args !== nextProps.config.args ||
+      !isArgsEqual(this.props.config.args, nextProps.config.args) ||
       this.props.cms !== nextProps.cms
     ) {
       this.subscription && this.subscription.unsubscribe();

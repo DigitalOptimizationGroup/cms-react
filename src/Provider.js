@@ -2,6 +2,8 @@ import * as React from "react";
 import { connect } from "@digitaloptgroup/cms";
 import { Context } from "./Context";
 
+// we could implement this, but right now everything is using
+// tracking by default
 export class Provider extends React.Component {
   constructor(props) {
     super(props);

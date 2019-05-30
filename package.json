@@ -1,22 +1,22 @@
 {
   "name": "@digitaloptgroup/cms-react",
-  "version": "0.0.1-dev-preview.02",
+  "version": "0.0.1-dev-preview.11",
   "description": "React SDK for Digital Optimization Group's Headless A/B Testing CMS",
   "repository": "https://github.com/DigitalOptimizationGroup/cms-react.git",
-  "main": "./lib/index.js",
+  "main": "dist/commonjs/index.js",
+  "module": "dist/es/index.js",
   "scripts": {
     "test": "jest --watch",
-    "build": "babel src -d lib --verbose;",
-    "watch": "babel src -d lib --watch --verbose;"
+    "watch": "babel src -d lib --watch --verbose;",
+    "build": "rimraf dist && npm run build:commonjs && npm run build:es",
+    "build:commonjs": "NODE_ENV=commonjs babel src --out-dir dist/commonjs",
+    "build:es": "NODE_ENV=es babel src --out-dir dist/es"
   },
   "author": "Digital Optimization Group LLC",
   "license": "MIT",
   "dependencies": {
-    "@digitaloptgroup/analytics": "0.0.1-pre-release.1",
-    "@digitaloptgroup/cms": "0.0.1-pre-release.1",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
-    "rxjs": "^6.4.0"
+    "@digitaloptgroup/analytics": "0.0.1-pre-release.03",
+    "@digitaloptgroup/cms": "0.0.1-pre-release.06"
   },
   "devDependencies": {
     "@babel/cli": "^7.2.0",
@@ -32,10 +32,14 @@
     "@babel/preset-env": "^7.0.0-beta.51",
     "@babel/register": "^7.0.0-beta.51",
     "jest": "^24.7.1",
-    "mock-socket": "^8.0.5"
+    "mock-socket": "^8.0.5",
+    "rimraf": "^2.6.3"
+  },
+  "peerDependencies": {
+    "react": ">= 16 < 17"
   },
   "sideEffects": false,
   "files": [
-    "/lib"
+    "/dist"
   ]
 }
