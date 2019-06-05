@@ -58,11 +58,18 @@ class ConnectFeature extends React.Component {
     if ((this.state.feature || {})._ab !== undefined) {
       // could render a not found component if passed in
       return (
-        <TrackExposure _ab={this.state.feature._ab}>
-          {this.props.children({
-            ...((this.state.feature || {}).assignment || {}),
-            _ab: this.state.feature._ab
-          })}
+        <TrackExposure
+          _ab={this.state.feature._ab}
+          queryName={this.props.queryName}
+          args={this.props.args}
+        >
+          {({ forwardedRef }) =>
+            this.props.children({
+              ...((this.state.feature || {}).assignment || {}),
+              _ab: this.state.feature._ab,
+              forwardedRef
+            })
+          }
         </TrackExposure>
       );
     }
