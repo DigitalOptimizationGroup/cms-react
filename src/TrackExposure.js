@@ -1,6 +1,8 @@
 import * as React from "react";
 import { useCallback } from "react";
 import { Context } from "./Context";
+import * as ReactIs from "react-is";
+
 /* 
 const ConnectTrackExposure = ({
   queryName,
@@ -34,7 +36,6 @@ const ConnectTrackExposure = ({
 
 class ConnectTrackExposure extends React.Component {
   forwardedRef = node => {
-    console.warn("this.forwardedRef.current", this.forwardedRef.current);
     if (this.forwardedRef.current) {
       this.props.unobserve(this.forwardedRef.current);
     }
@@ -48,6 +49,7 @@ class ConnectTrackExposure extends React.Component {
   componentDidMount() {
     if (!this.forwardedRef.current) {
       throw new Error(
+        // this could also be ListFeature or NestedFeature
         `<Feature queryName="${this.props.queryName}"${
           this.props.args ? " args={...}" : ""
         }> cannot find a DOM ref node. Provide ref={forwardRef} to the root DOM element. Learn more: https://www.npmjs.com/package/@digitaloptgroup/cms-react`
@@ -62,18 +64,24 @@ class ConnectTrackExposure extends React.Component {
   }
 
   render() {
-    // here this is pass the forwardedRef to the child and we don't know if it's
-    // an element yet, so we risk that it can be set up twice, which is not good
     const result = this.props.children({
-      forwardedRef: this.forwardedRef
+      ref: this.forwardedRef
     });
 
-    if (typeof result.type === "string") {
+    console.log(typeof result.type);
+    console.log("ReactIs", ReactIs.typeOf(result));
+    console.log("isElement", ReactIs.isElement(result));
+
+    if (typeof result.type === "string" || typeof result.type === "object") {
+      // if the render prop returns an Element we can attach the ref
       return React.cloneElement(result, {
         ref: this.forwardedRef
       });
     } else {
-      return result;
+      // otherwise we forward the ref and the user is responsible for attaching to a root Element
+      return React.cloneElement(result, {
+        forwardedRef: this.forwardedRef
+      });
     }
   }
 }

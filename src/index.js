@@ -4,6 +4,6 @@ export { NestedFeature } from "./NestedFeature";
 export { trackers } from "./Trackers";
 //export { Provider } from "./Provider";
 export { ProviderWithTracking } from "./ProviderWithTracking";
-export { TrackExposure } from "./TrackExposure";
+//export { TrackExposure } from "./TrackExposure";
 export { componentExperiment } from "./componentExperiment";
 export { ListFeature } from "./ListFeature";

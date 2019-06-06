@@ -14,7 +14,8 @@
   "license": "MIT",
   "dependencies": {
     "@digitaloptgroup/analytics": "0.0.1-pre-release.06",
-    "@digitaloptgroup/cms": "0.0.1-pre-release.12"
+    "@digitaloptgroup/cms": "0.0.1-pre-release.12",
+    "react-is": "^16.8.6"
   },
   "devDependencies": {
     "@babel/cli": "^7.2.0",

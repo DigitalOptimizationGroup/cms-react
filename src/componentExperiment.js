@@ -70,11 +70,14 @@ class ConnectComponentExperiment extends React.Component {
       return (
         <React.Suspense fallback={Loading}>
           <TrackExposure _ab={(this.state.feature || { _ab: {} })._ab}>
-            <Wrapper
-              {...(config.wrapperProps && config.wrapperProps[variation]) || {}}
-            >
-              <ComponentVariation />
-            </Wrapper>
+            {() => (
+              <Wrapper
+                {...(config.wrapperProps && config.wrapperProps[variation]) ||
+                  {}}
+              >
+                <ComponentVariation />
+              </Wrapper>
+            )}
           </TrackExposure>
         </React.Suspense>
       );
