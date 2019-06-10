@@ -17,7 +17,9 @@ function ConnectListFeature({ feature, queryName, args, children }) {
           {({ forwardedRef }) => {
             return children(
               {
-                ...assignment,
+                ...(Array.isArray(assignment)
+                  ? { list: assignment, isNestedList: true }
+                  : assignment),
                 _ab,
                 ...(forwardedRef ? { forwardedRef } : {})
               },

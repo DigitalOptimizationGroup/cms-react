@@ -23,7 +23,8 @@ export const featureProvider = WrappedComponent => {
         !isArgsEqual(args, nextProps.args) ||
         cms !== nextProps.cms
       ) {
-        this.subscription && this.subscription.unsubscribe();
+        // this is closing the websocket without reopening...
+        //this.subscription && this.subscription.unsubscribe();
         this.setState({ variationId: "", feature: {} });
         this.subscribeToFeature(nextProps);
       }
@@ -42,6 +43,7 @@ export const featureProvider = WrappedComponent => {
             });
           },
           error: e => {
+            console.log("e", e);
             if (e.status === 404) {
               this.setState({
                 error: {

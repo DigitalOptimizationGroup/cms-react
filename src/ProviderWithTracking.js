@@ -17,7 +17,8 @@ export class ProviderWithTracking extends React.Component {
     const cms = connect({
       apikey: this.props.apikey,
       apiUrl: this.props.apiUrl,
-      vid: this.props.vid
+      vid: this.props.vid,
+      realtimeUrl: this.props.realtimeUrl
     });
 
     this.setState({

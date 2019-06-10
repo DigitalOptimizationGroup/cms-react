@@ -1,7 +1,6 @@
 import * as React from "react";
 import { useCallback } from "react";
 import { Context } from "./Context";
-import * as ReactIs from "react-is";
 
 /* 
 const ConnectTrackExposure = ({
@@ -67,10 +66,6 @@ class ConnectTrackExposure extends React.Component {
     const result = this.props.children({
       ref: this.forwardedRef
     });
-
-    console.log(typeof result.type);
-    console.log("ReactIs", ReactIs.typeOf(result));
-    console.log("isElement", ReactIs.isElement(result));
 
     if (typeof result.type === "string" || typeof result.type === "object") {
       // if the render prop returns an Element we can attach the ref
