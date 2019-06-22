@@ -1,10 +1,23 @@
 import * as React from "react";
-// import { Context } from "./Context";
 import { TrackExposure } from "./TrackExposure";
-// import { isArgsEqual } from "./isArgsEqual";
 import { featureProvider } from "./featureProvider";
 
-function ConnectFeature({ feature, queryName, args, children }) {
+function ConnectFeature({
+  feature,
+  queryName,
+  args,
+  isLoading,
+  loadingCallback,
+  errorCallback,
+  error,
+  children
+}) {
+  if (error && errorCallback) {
+    return errorCallback({ queryName, args, error });
+  }
+  if (isLoading && loadingCallback) {
+    return loadingCallback({ queryName, args });
+  }
   if ((feature || {})._ab !== undefined) {
     return (
       <TrackExposure _ab={feature._ab} queryName={queryName} args={args}>

@@ -1,6 +1,6 @@
 {
   "name": "@digitaloptgroup/cms-react",
-  "version": "0.0.1-dev-preview.22",
+  "version": "0.0.1-dev-preview.24",
   "description": "React SDK for Digital Optimization Group's Headless A/B Testing CMS",
   "repository": "https://github.com/DigitalOptimizationGroup/cms-react.git",
   "main": "dist/commonjs/index.js",
@@ -14,7 +14,7 @@
   "license": "MIT",
   "dependencies": {
     "@digitaloptgroup/analytics": "0.0.1-pre-release.07",
-    "@digitaloptgroup/cms": "0.0.1-pre-release.13"
+    "@digitaloptgroup/cms": "0.0.1-pre-release.15"
   },
   "devDependencies": {
     "@babel/cli": "^7.2.0",
