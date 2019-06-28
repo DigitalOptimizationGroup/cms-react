@@ -8,3 +8,4 @@ export { ProviderWithTracking } from "./ProviderWithTracking";
 export { componentExperiment } from "./componentExperiment";
 export { ListFeature } from "./ListFeature";
 export { NestedListFeature } from "./NestedListFeature";
+export { ListFeature2 } from "./ListFeature2";

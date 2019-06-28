@@ -6,29 +6,34 @@ import { featureProvider } from "./featureProvider";
 
 function ConnectListFeature({ feature, queryName, args, children }) {
   if ((feature || {})._ab !== undefined) {
-    return feature.assignment.map(({ assignment, _ab }, i) => {
-      return (
-        <TrackExposure
-          _ab={_ab}
-          key={_ab.variationId}
-          queryName={queryName}
-          args={args}
-        >
-          {({ forwardedRef }) => {
-            return children(
-              {
-                ...(Array.isArray(assignment)
-                  ? { list: assignment, isNestedList: true }
-                  : assignment),
-                _ab,
-                ...(forwardedRef ? { forwardedRef } : {})
-              },
-              i,
-              feature.assignment // the whole list
-            );
-          }}
-        </TrackExposure>
-      );
+    return feature.assignment.map((feature, i) => {
+      const { assignment, _ab } = feature;
+      if (_ab !== undefined && assignment !== undefined) {
+        return (
+          <TrackExposure
+            _ab={_ab}
+            key={_ab.variationId}
+            queryName={queryName}
+            args={args}
+          >
+            {({ forwardedRef }) => {
+              return children(
+                {
+                  ...(Array.isArray(assignment)
+                    ? { list: assignment, isNestedList: true }
+                    : assignment),
+                  _ab,
+                  ...(forwardedRef ? { forwardedRef } : {})
+                },
+                i,
+                feature.assignment // the whole list
+              );
+            }}
+          </TrackExposure>
+        );
+      } else {
+        return null;
+      }
     });
   }
 

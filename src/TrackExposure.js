@@ -45,15 +45,54 @@ class ConnectTrackExposure extends React.Component {
     }
   };
 
+  /*
+  default div
+  tagName="span"
+  tagName={null} -> ONLY case to pass ref
+
+  const {queryName, args, tagName: TagName, ...rest} = props;
+
+  if (TagName) {
+    return <TagName {...rest} ref={forwardedRef}> {this.children()}</TagName>
+  } else {
+    return this.children();
+  }
+
+
+
+
+
+
+  const containerRef = useCallback(node => {
+    if (node){ 
+      $(node);
+    }
+  })
+
+  <Feature ref={containerRef} queryNAme="ASdf" >
+{   (stuff) => {
+
+}}
+  </Feature>
+  */
+
   componentDidMount() {
-    if (!this.forwardedRef.current) {
+    // <Feature tagName={null} />;
+    // if (this.forwardedRef.current) {
+    //   throw "dont use both";
+    // } else if (somehowgetProps.tagName) {
+    //   // use tagName
+    // } else {
+    //   throw "use one of them";
+    // }
+    /* if (!this.forwardedRef.current) {
       throw new Error(
         // this could also be ListFeature or NestedFeature
         `<Feature queryName="${this.props.queryName}"${
           this.props.args ? " args={...}" : ""
         }> cannot find a DOM ref node. Provide ref={forwardRef} to the root DOM element. Learn more: https://www.npmjs.com/package/@digitaloptgroup/cms-react`
       );
-    }
+    } */
   }
 
   componentWillUnmount() {
@@ -67,6 +106,7 @@ class ConnectTrackExposure extends React.Component {
       ref: this.forwardedRef
     });
 
+    // this object thing won't work reliably
     if (typeof result.type === "string" || typeof result.type === "object") {
       // if the render prop returns an Element we can attach the ref
       return React.cloneElement(result, {

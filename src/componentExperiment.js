@@ -29,6 +29,7 @@ class ConnectComponentExperiment extends React.Component {
   }
 
   subscribeToFeature = ({ cms, config }) => {
+    // config is string then just as arg value
     const queryName = config.queryName || "componentExperiment";
     const args = config.args || { experimentName: config.experimentName };
     this.subscription =

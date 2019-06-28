@@ -27,7 +27,7 @@ export const featureProvider = WrappedComponent => {
         !isArgsEqual(args, nextProps.args)
       ) {
         this.setState({
-          feature: undefined,
+          // feature: undefined,
           isLoading: true,
           error: undefined
         });
@@ -58,7 +58,7 @@ export const featureProvider = WrappedComponent => {
               isLoading: false,
               error: {
                 message: "404 - Feature not found",
-                status: 404
+                code: 404
               }
             });
           } else {
@@ -66,7 +66,7 @@ export const featureProvider = WrappedComponent => {
               isLoading: false,
               error: {
                 message: "500 - API Error",
-                status: 500
+                code: 500
               }
             });
           }
@@ -75,13 +75,7 @@ export const featureProvider = WrappedComponent => {
     };
 
     render() {
-      const {
-        children,
-        queryName,
-        args,
-        errorCallback,
-        loadingCallback
-      } = this.props;
+      const { children, queryName, args } = this.props;
 
       if (typeof children !== "function") {
         throw new Error(
@@ -93,16 +87,11 @@ export const featureProvider = WrappedComponent => {
         );
       }
 
-      // call and return error or loading callbacks if applicable
       const { error, feature, isLoading } = this.state;
-      if (error && errorCallback) {
-        return errorCallback({ queryName, args, error });
-      } else if (isLoading && loadingCallback) {
-        return loadingCallback({ queryName, args });
-      }
+      const { cms, ...rest } = this.props;
       return (
         <WrappedComponent
-          {...this.props}
+          {...rest}
           feature={feature}
           isLoading={isLoading}
           error={error}

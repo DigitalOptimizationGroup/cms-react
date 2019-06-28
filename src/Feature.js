@@ -2,36 +2,51 @@ import * as React from "react";
 import { TrackExposure } from "./TrackExposure";
 import { featureProvider } from "./featureProvider";
 
-function ConnectFeature({
-  feature,
-  queryName,
-  args,
-  isLoading,
-  loadingCallback,
-  errorCallback,
-  error,
-  children
-}) {
-  if (error && errorCallback) {
-    return errorCallback({ queryName, args, error });
-  }
-  if (isLoading && loadingCallback) {
-    return loadingCallback({ queryName, args });
-  }
-  if ((feature || {})._ab !== undefined) {
+function ConnectFeature(props) {
+  const {
+    feature,
+    queryName,
+    args,
+    isLoading,
+    error,
+    children,
+    tagName: TagName = "div",
+    ...rest
+  } = props;
+  if (isLoading) {
+    return children({ isLoading });
+  } else if (error) {
+    return children({ isLoading, error });
+  } else {
     return (
       <TrackExposure _ab={feature._ab} queryName={queryName} args={args}>
-        {({ forwardedRef, ref }) => {
-          return children({
-            ...((feature || {}).assignment || {}),
-            _ab: feature._ab,
-            ...(forwardedRef ? { forwardedRef } : {})
-          });
+        {({ forwardedRef }) => {
+          // if TagName === null then we do not wrap in a root element and forward the ref
+          if (TagName === null) {
+            return children({
+              feature: (feature || {}).assignment || {},
+              _ab: feature._ab,
+              forwardedRef,
+              isLoading,
+              error
+            });
+          }
+          return (
+            <TagName
+              {...rest}
+              ref={forwardedRef}
+              children={children({
+                feature: (feature || {}).assignment || {},
+                _ab: feature._ab,
+                isLoading,
+                error
+              })}
+            />
+          );
         }}
       </TrackExposure>
     );
   }
-  return children((feature || {}).assignment || {});
 }
 
 export const Feature = featureProvider(ConnectFeature);
