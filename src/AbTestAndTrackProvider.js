@@ -3,7 +3,7 @@ import { connect } from "@digitaloptgroup/cms";
 import { Context } from "./Context";
 import { initTracker } from "@digitaloptgroup/analytics";
 
-export class ProviderWithTracking extends React.Component {
+export class AbTesting extends React.Component {
   constructor(props) {
     super(props);
     this.cms = connect({

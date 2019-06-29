@@ -6,7 +6,8 @@ export const featureProvider = WrappedComponent => {
   class ConnectFeature extends React.Component {
     state = {
       isLoading: true,
-      feature: null,
+      variation: null,
+      tracking: null,
       error: null
     };
 
@@ -19,7 +20,7 @@ export const featureProvider = WrappedComponent => {
     }
 
     componentWillReceiveProps(nextProps) {
-      const { queryName, args, cms } = this.props;
+      const { queryName, args } = this.props;
       // this check allows the subscribed feature to change when the args change
       // such as by the url changing but the component still being mounted
       if (
@@ -27,7 +28,6 @@ export const featureProvider = WrappedComponent => {
         !isArgsEqual(args, nextProps.args)
       ) {
         this.setState({
-          // feature: null,
           isLoading: true,
           error: null
         });
@@ -49,7 +49,8 @@ export const featureProvider = WrappedComponent => {
         next: feature => {
           this.setState({
             isLoading: false,
-            feature
+            variation: feature.variation,
+            tracking: feature.tracking
           });
         },
         error: e => {
@@ -75,24 +76,13 @@ export const featureProvider = WrappedComponent => {
     };
 
     render() {
-      const { children, queryName, args } = this.props;
-
-      if (typeof children !== "function") {
-        throw new Error(
-          `The child of <Feature queryName="${queryName}"${
-            args ? " args={...}" : ""
-          }> is not a Function. You need to provide a render prop such as <Feature queryName="${queryName}"${
-            args ? " args={...}" : ""
-          }>{(props)=><div/>}</Feature>. Learn more: https://www.npmjs.com/package/@digitaloptgroup/cms-react`
-        );
-      }
-
-      const { error, feature, isLoading } = this.state;
+      const { error, variation, tracking, isLoading } = this.state;
       const { cms, ...rest } = this.props;
       return (
         <WrappedComponent
           {...rest}
-          feature={feature}
+          variation={variation}
+          tracking={tracking}
           isLoading={isLoading}
           error={error}
         />
