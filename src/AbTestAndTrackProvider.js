@@ -3,13 +3,33 @@ import { connect } from "@digitaloptgroup/cms";
 import { Context } from "./Context";
 import { initTracker } from "@digitaloptgroup/analytics";
 
+const appConfig =
+  (typeof window !== "undefined" && window.__APP_CONFIG__) || {};
+
 export class AbTesting extends React.Component {
   constructor(props) {
     super(props);
+
+    const projectId = this.props.projectId || appConfig.projectId;
+
+    if (projectId === undefined) {
+      throw Error(
+        "projectId must be passed as a prop to the @digitaloptgroup/cms-react provider: <AbTesting projectId={undefined} />"
+      );
+    }
+
+    const cmsConfig = {
+      apiUrl: `https://api-${projectId}.edgeyates.com`,
+      projectId,
+      rid: appConfig.rid,
+      vid: appConfig.vid,
+      startTimestamp: appConfig.startTimestamp
+    };
+
     this.cms = connect({
-      apikey: this.props.apikey,
-      apiUrl: this.props.apiUrl,
-      vid: this.props.vid,
+      apikey: this.props.apiKey || cmsConfig.apiKey,
+      apiUrl: this.props.apiUrl || cmsConfig.apiUrl,
+      vid: this.props.vid || cmsConfig.vid,
       realtimeUrl: this.props.realtimeUrl
     });
 
@@ -20,11 +40,11 @@ export class AbTesting extends React.Component {
       initIntersectionObserver
     } = initTracker(
       {
-        rid: props.rid,
-        vid: props.vid,
-        projectId: props.projectId,
-        startTimestamp: props.startTimestamp,
-        apiKey: props.apiKey
+        rid: this.props.rid || cmsConfig.rid,
+        vid: this.props.vid || cmsConfig.vid,
+        projectId: this.props.projectId || cmsConfig.projectId,
+        startTimestamp: this.props.startTimestamp || cmsConfig.startTimestamp,
+        apiKey: this.props.apiKey || cmsConfig.apiKey
       },
       this.props.wsFqdn
     );
