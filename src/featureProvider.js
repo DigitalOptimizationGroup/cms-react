@@ -6,8 +6,8 @@ export const featureProvider = WrappedComponent => {
   class ConnectFeature extends React.Component {
     state = {
       isLoading: true,
-      feature: undefined,
-      error: undefined
+      feature: null,
+      error: null
     };
 
     componentDidMount() {
@@ -27,9 +27,9 @@ export const featureProvider = WrappedComponent => {
         !isArgsEqual(args, nextProps.args)
       ) {
         this.setState({
-          // feature: undefined,
+          // feature: null,
           isLoading: true,
-          error: undefined
+          error: null
         });
         // Underlying webSocket is ref counted, and this might be the only
         // subscription at this point, so we want to make sure we subscribe to

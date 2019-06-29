@@ -13,10 +13,8 @@ function ConnectFeature(props) {
     tagName: TagName = "div",
     ...rest
   } = props;
-  if (isLoading) {
-    return children({ isLoading });
-  } else if (error) {
-    return children({ isLoading, error });
+  if (isLoading || error) {
+    return children({ isLoading, feature, error });
   } else {
     return (
       <TrackExposure _ab={feature._ab} queryName={queryName} args={args}>

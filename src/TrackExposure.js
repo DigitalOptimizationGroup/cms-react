@@ -85,14 +85,14 @@ class ConnectTrackExposure extends React.Component {
     // } else {
     //   throw "use one of them";
     // }
-    /* if (!this.forwardedRef.current) {
+    if (!this.forwardedRef.current) {
       throw new Error(
         // this could also be ListFeature or NestedFeature
         `<Feature queryName="${this.props.queryName}"${
           this.props.args ? " args={...}" : ""
-        }> cannot find a DOM ref node. Provide ref={forwardRef} to the root DOM element. Learn more: https://www.npmjs.com/package/@digitaloptgroup/cms-react`
+        }> cannot find a DOM ref node. Provide ref={forwardedRef} to the root DOM element. Learn more: https://www.npmjs.com/package/@digitaloptgroup/cms-react`
       );
-    } */
+    }
   }
 
   componentWillUnmount() {
@@ -103,21 +103,24 @@ class ConnectTrackExposure extends React.Component {
 
   render() {
     const result = this.props.children({
-      ref: this.forwardedRef
+      forwardedRef: this.forwardedRef
     });
 
-    // this object thing won't work reliably
-    if (typeof result.type === "string" || typeof result.type === "object") {
-      // if the render prop returns an Element we can attach the ref
-      return React.cloneElement(result, {
-        ref: this.forwardedRef
-      });
-    } else {
-      // otherwise we forward the ref and the user is responsible for attaching to a root Element
-      return React.cloneElement(result, {
-        forwardedRef: this.forwardedRef
-      });
-    }
+    return result;
+
+    // // this object thing won't work reliably
+    // if (typeof result.type === "string") {
+    //   // || typeof result.type === "object") {
+    //   // if the render prop returns an Element we can attach the ref
+    //   return React.cloneElement(result, {
+    //     ref: this.forwardedRef
+    //   });
+    // } else {
+    //   // otherwise we forward the ref and the user is responsible for attaching to a root Element
+    //   return React.cloneElement(result, {
+    //     forwardedRef: this.forwardedRef
+    //   });
+    // }
   }
 }
 

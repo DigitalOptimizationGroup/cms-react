@@ -4,41 +4,127 @@ import { TrackExposure } from "./TrackExposure";
 // import { isArgsEqual } from "./isArgsEqual";
 import { featureProvider } from "./featureProvider";
 
-function ConnectListFeature({ feature, queryName, args, children }) {
-  if ((feature || {})._ab !== undefined) {
-    return feature.assignment.map((feature, i) => {
-      const { assignment, _ab } = feature;
-      if (_ab !== undefined && assignment !== undefined) {
-        return (
-          <TrackExposure
-            _ab={_ab}
-            key={_ab.variationId}
-            queryName={queryName}
-            args={args}
-          >
-            {({ forwardedRef }) => {
-              return children(
-                {
-                  ...(Array.isArray(assignment)
-                    ? { list: assignment, isNestedList: true }
-                    : assignment),
-                  _ab,
-                  ...(forwardedRef ? { forwardedRef } : {})
-                },
-                i,
-                feature.assignment // the whole list
-              );
-            }}
-          </TrackExposure>
-        );
-      } else {
-        return null;
-      }
-    });
-  }
+function ConnectListFeature(props) {
+  const {
+    feature,
+    queryName,
+    args,
+    isLoading,
+    error,
+    children,
+    tagName: TagName = "div",
+    parentTagName: ParentTagName = "div",
+    ...rest
+  } = props;
 
-  // probably we don't want to return null but rather pass in some loading state
-  return null;
+  if (isLoading) {
+    return children({ isLoading });
+  } else if (error) {
+    return children({ isLoading, error });
+  } else {
+    return (
+      <TrackExposure _ab={feature._ab} queryName={queryName} args={args}>
+        {({ forwardedRef }) => {
+          // if TagName === null then we do not wrap in a root element and forward the ref
+          if (ParentTagName === null) {
+            return feature.assignment.map((feature, i) => {
+              const { assignment, _ab } = feature;
+              if (_ab !== undefined && assignment !== undefined) {
+                return (
+                  <TrackExposure
+                    _ab={_ab}
+                    key={_ab.variationId}
+                    queryName={queryName}
+                    args={args}
+                  >
+                    {({ forwardedRef }) => {
+                      // if TagName === null then we do not wrap in a root element and forward the ref
+                      if (TagName === null) {
+                        return children({
+                          feature: (feature || {}).assignment || {},
+                          _ab: feature._ab,
+                          forwardedRef,
+                          isLoading,
+                          error
+                        });
+                      }
+                      return (
+                        <TagName
+                          {...rest}
+                          ref={forwardedRef}
+                          children={children({
+                            feature: (feature || {}).assignment || {},
+                            _ab: feature._ab,
+                            isLoading,
+                            error
+                          })}
+                        />
+                      );
+                    }}
+                  </TrackExposure>
+                );
+              } else {
+                return null;
+              }
+            });
+          }
+          return (
+            <ParentTagName
+              {...rest}
+              ref={forwardedRef}
+              children={children({
+                feature: (feature || {}).assignment || {},
+                _ab: feature._ab,
+                isLoading,
+                error
+              })}
+            >
+              {feature.assignment.map((feature, i) => {
+                const { assignment, _ab } = feature;
+                if (_ab !== undefined && assignment !== undefined) {
+                  return (
+                    <TrackExposure
+                      _ab={_ab}
+                      key={_ab.variationId}
+                      queryName={queryName}
+                      args={args}
+                    >
+                      {({ forwardedRef }) => {
+                        // if TagName === null then we do not wrap in a root element and forward the ref
+                        if (TagName === null) {
+                          return children({
+                            feature: (feature || {}).assignment || {},
+                            _ab: feature._ab,
+                            forwardedRef,
+                            isLoading,
+                            error
+                          });
+                        }
+                        return (
+                          <TagName
+                            {...rest}
+                            ref={forwardedRef}
+                            children={children({
+                              feature: (feature || {}).assignment || {},
+                              _ab: feature._ab,
+                              isLoading,
+                              error
+                            })}
+                          />
+                        );
+                      }}
+                    </TrackExposure>
+                  );
+                } else {
+                  return null;
+                }
+              })}
+            </ParentTagName>
+          );
+        }}
+      </TrackExposure>
+    );
+  }
 }
 
 export const ListFeature = featureProvider(ConnectListFeature);

@@ -32,28 +32,26 @@ class ConnectComponentExperiment extends React.Component {
     // config is string then just as arg value
     const queryName = config.queryName || "componentExperiment";
     const args = config.args || { experimentName: config.experimentName };
-    this.subscription =
-      cms &&
-      cms({
-        queryName,
-        args
-      }).subscribe({
-        next: feature => {
+    this.subscription = cms({
+      queryName,
+      args
+    }).subscribe({
+      next: feature => {
+        this.setState({
+          feature
+        });
+      },
+      error: e => {
+        if (e.status === 404) {
           this.setState({
-            feature
+            error: {
+              message: "404 - Feature not found",
+              status: 404
+            }
           });
-        },
-        error: e => {
-          if (e.status === 404) {
-            this.setState({
-              error: {
-                message: "404 - Feature not found",
-                status: 404
-              }
-            });
-          }
         }
-      });
+      }
+    });
   };
 
   render() {
@@ -71,10 +69,11 @@ class ConnectComponentExperiment extends React.Component {
       return (
         <React.Suspense fallback={Loading}>
           <TrackExposure _ab={(this.state.feature || { _ab: {} })._ab}>
-            {() => (
+            {({ forwardedRef }) => (
               <Wrapper
                 {...(config.wrapperProps && config.wrapperProps[variation]) ||
                   {}}
+                ref={forwardedRef}
               >
                 <ComponentVariation />
               </Wrapper>
