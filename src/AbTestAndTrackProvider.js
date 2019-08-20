@@ -1,7 +1,7 @@
 import * as React from "react";
 import { connect } from "@digitaloptgroup/cms";
 import { Context } from "./Context";
-import { initTracker } from "@digitaloptgroup/analytics";
+//import { initTracker } from "@digitaloptgroup/analytics";
 
 const appConfig =
   (typeof window !== "undefined" && window.__APP_CONFIG__) || {};
@@ -30,32 +30,39 @@ export class AbTesting extends React.Component {
       apikey: this.props.apiKey || cmsConfig.apiKey,
       apiUrl: this.props.apiUrl || cmsConfig.apiUrl,
       vid: this.props.vid || cmsConfig.vid,
-      realtimeUrl: this.props.realtimeUrl
+      realtimeUrl: this.props.realtimeUrl,
+      ssrCache: this.props.ssrCache,
+      resolver: this.props.resolver
     });
 
-    const {
-      pathChange,
-      outcome,
-      caughtError,
-      initIntersectionObserver
-    } = initTracker(
-      {
-        rid: this.props.rid || cmsConfig.rid,
-        vid: this.props.vid || cmsConfig.vid,
-        projectId: this.props.projectId || cmsConfig.projectId,
-        startTimestamp: this.props.startTimestamp || cmsConfig.startTimestamp,
-        apiKey: this.props.apiKey || cmsConfig.apiKey
-      },
-      this.props.wsFqdn
-    );
+    // only run this code in the browser
+    if (typeof window !== "undefined") {
+      const { initTracker } = require("@digitaloptgroup/analytics");
+      console.log("init tracker", initTracker);
+      const {
+        pathChange,
+        outcome,
+        caughtError,
+        initIntersectionObserver
+      } = initTracker(
+        {
+          rid: this.props.rid || cmsConfig.rid,
+          vid: this.props.vid || cmsConfig.vid,
+          projectId: this.props.projectId || cmsConfig.projectId,
+          startTimestamp: this.props.startTimestamp || cmsConfig.startTimestamp,
+          apiKey: this.props.apiKey || cmsConfig.apiKey
+        },
+        this.props.wsFqdn
+      );
 
-    const { observe, unobserve } = initIntersectionObserver();
+      const { observe, unobserve } = initIntersectionObserver();
 
-    this.pathChange = pathChange;
-    this.caughtError = caughtError;
-    this.outcome = outcome;
-    this.observe = observe;
-    this.unobserve = unobserve;
+      this.pathChange = pathChange;
+      this.caughtError = caughtError;
+      this.outcome = outcome;
+      this.observe = observe;
+      this.unobserve = unobserve;
+    }
   }
 
   render() {

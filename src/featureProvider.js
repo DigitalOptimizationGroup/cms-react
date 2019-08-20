@@ -11,6 +11,16 @@ export const featureProvider = WrappedComponent => {
       error: null
     };
 
+    componentWillMount() {
+      // if server
+      // do the stuff
+      // embed the data into the worker so we can be sync here
+      if (typeof self !== "undefined" && typeof window === "undefined") {
+        console.log("self !== undefined");
+        this.subscription = this.subscribeToFeature(this.props);
+      }
+    }
+
     componentDidMount() {
       this.subscription = this.subscribeToFeature(this.props);
     }
@@ -47,6 +57,7 @@ export const featureProvider = WrappedComponent => {
         args
       }).subscribe({
         next: feature => {
+          console.log("Feature", { queryName, args, feature });
           this.setState({
             isLoading: false,
             variation: feature.variation,
