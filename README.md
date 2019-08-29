@@ -1,12 +1,12 @@
 # Digital Optimization Group - Headless CMS for A/B Testing - React SDK
 
-This library is a developer preview.
+This library is a _developer preview_.
 
 It provides an easy and powerful way to implement A/B testing with `React`. It is made to work with Digital Optimization Groups' Headless CMS and requires an account on our platform.
 
-Signing up to developer preview requires an invite. You may get one from a current user or you may email `invites@digitaloptgroup.com`. We are people and developers over here too, so just tell us a bit about yourself and what you have in mind. We'll try to reach out to as many requests as possible.
+Signing up for a developer preview requires an invite. If you would like to join the waiting list for access please email us at preview@digitaloptgroup.com.
 
-## Features
+The SDK includes the following features:
 
 - Simple implementation with a render prop
 - A/B/n testing of arbitrary data structures
@@ -14,48 +14,156 @@ Signing up to developer preview requires an invite. You may get one from a curre
 - Viewport exposure tracking of all variations
 - Wide range of client metrics automatically collected and associated with variations
 
-## Usage
+# <a name="installation" class="anchor"></a>Installation
+
+The DigitalOpt Group React SDK can be installed and added to the project specific dependencies by running the following command:
 
 ```
 npm install --save @digitaloptgroup/cms-react
 ```
 
-Wrap your root component in our provider.
+The SDK provides the following set of `Providers` and `Render Props`:
+
+- AbTesting
+- Feature
+- Feature.Track
+- withOutcome
+- withPathChange
+- withCaughtError
+
+## Documentation
+
+https://docs.digitaloptgroup.com
+
+# <a name="ProviderWithTracking" class="anchor"></a>AbTesting Provider
+
+Digital Optimization Groups' React SDK makes uses of a provider to inject all the required code into your application.
+
+The _provider_ is required for the correct usage of the SDK. Its main purposes are:
+
+- Make a connection to the public API
+- Provide RealTime development feature
+- Initialize analytics tracking
+
+The provider should be placed at the `root` of your application and expect a set of configuration properties (explained below):
+
+## Props
+
+The React SDK requires a set of keys and configurations required to connect the Client Application with the Public API.
+
+<b>projectId (required)</b><br/>
+The Application Id or Project Id given to you by Digital Optimization Group when creating your account.
+
+<b>vid (optional)</b><br/>
+Internally the API sets a cookie with a unique ID for each user. This cookie is used to assure consistent assignment of variations. You may optionally pass in your own unique visitor identifier that will be used to provide assignments.
+
+<b>rid (optional)</b><br/>
+Unique request Id. If you are deploying your application into the DigitalOptADN you should not set this as it will be done for you automatically.
+
+<b>startTimestamp (optional)</b><br/>
+Server timestamp of request Id creation time. If you are deploying your application into the DigitalOptADN you should not set this as it will be done for you automatically.
+
+## Usage
 
 ```js
-import { ProviderWithTracking } from "@digitaloptgroup/cms-react";
-
-const appConfig =
-  (typeof window !== "undefined" && window.__APP_CONFIG__) || {};
-
-const cmsConfig = {
-  apiUrl: "api-url-for-your-project",
-  projectId: appConfig.projectId,
-  rid: appConfig.rid,
-  vid: appConfig.vid,
-  startTimestamp: appConfig.startTimestamp,
-  apiKey: "your_api_key"
-};
+import { AbTesting } from "@digitaloptgroup/cms-react";
 
 ReactDOM.render(
-  <ProviderWithTracking {...cmsConfig}>
+  <AbTesting projectId="your-app-or-project-id">
     <App />
-  </ProviderWithTracking>,
+  </AbTesting>,
   document.getElementById("root")
 );
 ```
 
-Anywhere in your app load A/B testing data from our API. Our API is deployed across 180+ worldwide datacenters for low-latency resolution.
+# <a name="components" class="anchor"></a>Components
+
+All components provided by SDK, are written as [Render Props](https://reactjs.org/docs/render-props.html) or Higher Order Components, to provide a full set of features, with minimal impact on your app.
+
+There are currently 2 render props, and they are:
+
+- Feature
+- Feature.Track
+
+And 3 higher order components:
+
+- withCaughtError
+- withOutcome
+- withPathChange
+
+# <a name="Feature" class="anchor"></a>Feature
+
+This component fetches the data related to a Schema from the CMS ([Feature Schema Documentation](/cms/schema#types)).
+
+## Props
+
+Props that can be passed to the `Feature` component.
+<b>queryName (required)</b><br/>
+The root entrypoint to query your API. This is defined in the CMS when creating a new Schema.
+
+<b>args (as required by Schema type)</b><br/>
+When defining a Schema it may be created with one or more parameters, such as `path` for blog posts, `lang` for localization, or `sku` for products. Providing these to the `Feature` component will allow you to query for a specific Feature that implements a given Schema.
+
+## Provided Props
+
+Props passed from `Feature` to the user's render prop function.
+
+<b>error</b><br/>
+Provided in the event of an error.
+
+```ts
+type Error = null | { code: number; message: string };
+```
+
+> <b>Note on serving 404 pages</b><br/>
+> If the given combination of `queryName` and `args` does not result in a feature this will return a 404 error with the following object:
 
 ```js
-import React from "react";
+{code: 404, message: "404 - Feature not found"}
+```
+
+This is useful if you are serving pages, such as blog posts, and would like to dynamically show your visitors 404 pages when a page does not exist.
+
+<b>isLoading</b><br/>
+A boolean prop indicating feature loading.
+
+```ts
+type IsLoading = boolean;
+```
+
+<b>variation</b><br/>
+The variation assigned to a given user for the requested feature. This can be either an object containing the properties defined by the feature's schema or it can be a list of variations.
+
+```ts
+type Variation =
+  | FeatureSchema
+  | Array<{ tracking: Tracking; variation: FeatureSchema }>;
+type FeatureSchema = { [key]: any };
+```
+
+<b>tracking</b><br/>
+The tracking object associated with a given variation.
+
+```ts
+type Tracking = {
+  releaseId: string;
+  featureId: string;
+  variationId: string;
+  exposureId: string;
+};
+```
+
+## Usage
+
+```js
 import { Feature } from "@digitaloptgroup/cms-react";
 
 function App() {
   return (
     <Feature queryName="helloWorld">
-      {({ headline, subhead, image }) => {
-        if (headline) {
+      {({ error, isLoading, variation, tracking }) => {
+        if (variation) {
+          const { image, headline, subhead } = variation;
           return (
             <div>
               <img src={image.url} />
@@ -63,136 +171,221 @@ function App() {
               <h4>{subhead}</h4>
             </div>
           );
+        } else if (isLoading) {
+          return <div>Loading...</div>;
+        } else if (error) {
+          return (
+            <div>
+              {error.code} : {error.message}
+            </div>
+          );
         }
-        return <div>Loading...</div>;
       }}
     </Feature>
   );
 }
-
-export default App;
 ```
 
-A/B testing components with lazy loading (of only the components selected for a given visitor).
+# <a name="feature-track" class="anchor"></a>Feature.Track
+
+This component provides viewport tracking for assigned variations including proportion of exposure and time in viewport.
+
+## Props
+
+Props that MUST be passed to the `Feature.Track` component.
+
+<b>releaseId (required)</b><br/>
+This Id represents a hash of the entire release and provides integrity when analyzing data by assuring it is always possible to know what other elements may have been under test at any given time.
+
+<b>featureId (required)</b><br/>
+Represents a hash of all the variations for a given feature in a given release. It provides integrity to know what other variations where under test for a given feature.
+
+<b>variationId (required)</b><br/>
+A hash of the variation, assuring integrity of knowing the exact content for a given variation.
+
+<b>exposureId (required)</b><br/>
+Not currently used, but still required. This may be used in the future for more granular exposure tracking than provided at the variation level (like by fields).
+
+## Provided Props
+
+Props passed from `Feature.Track` to the user's render prop function.
+
+<b>trackingRef</b><br/>
+A React ref that MUST be attached to a root DOM element surrounding the implementation of a given variation.
+
+## Usage
 
 ```js
-import React, { lazy } from "react";
-import { componentExperiment } from "@digitaloptgroup/cms-react";
-
-const MyComponent = componentExperiment(
-  {
-    a: lazy(() => import("./AComponent")),
-    b: lazy(() => import("./BComponent"))
-  },
-  {
-    experimentName: "example",
-    // optional loading Component passed into a <Suspense/> wrapper that is
-    // displayed while your component is loading
-    Loading: <div>Loading...</div>
-  }
-);
-
-function App() {
-  return (
-    <div>
-      <MyComponent />
-    </div>
-  );
-}
-
-export default App;
-```
-
-A/B testing lists of data structures.
-
-```js
-import React, { Component } from "react";
-import { ListFeature, NestedFeature } from "@digitaloptgroup/cms-react";
-
-function MainNav() {
-  return (
-    <ListFeature queryName="mainNav">
-      {({ text, path }) => {
-        return (
-          <div
-            key={i}
-            onClick={this.props.linkTo(`/${path === "/" ? "" : path}`)}
-            style={{ padding: "20px", cursor: "pointer" }}
-          >
-            {text}
-          </div>
-        );
-      }}
-    </ListFeature>
-  );
-}
-
-export default MainNav;
-```
-
-It's simple to add localization or any other kind of segmentation by adding parameters to your schemas and then using those to make queries at runtime. For example by adding `args={{ language: navigation.language }}` to our first example, we could query by language (obviously greatly simplified for example).
-
-```js
-import React from "react";
 import { Feature } from "@digitaloptgroup/cms-react";
 
 function App() {
   return (
-    <Feature queryName="helloWorld" args={{ language: navigation.language }}>
-      {({ headline, subhead, image }) => {
-        if (headline) {
+    <Feature queryName="helloWorld">
+      {({ error, isLoading, variation, tracking }) => {
+        if (variation) {
           return (
-            <div>
-              <img src={image.url} />
-              <h1>{headline}</h1>
-              <h4>{subhead}</h4>
-            </div>
+            <Feature.Track {...tracking}>
+              {({ trackingRef }) => {
+                return <div ref={trackingRef}>{/*...*/}</div>;
+              }}
+            </Feature.Track>
           );
         }
-        return <div>Loading...</div>;
+        /* ... */
       }}
     </Feature>
   );
 }
-
-export default App;
 ```
 
-## Advanced configuration
+# <a name="tracking" class="anchor"></a>Higher Order Components for Metrics
 
-Full configuration options for Component A/B testing.
+Refer to [A/B Testing Analytics](/analytics/a-b-testing) for a full overview of metrics automatically and manually tracked by this SDK.
+
+This section will cover the manual tracking details from the SDK.
+
+The SDK provides a set of higher order component that offers the possiblity of wrapping your components to track additional analytics information not tracked automatically.
+
+The use of these HOCs requires the main application to wrapped within the _AbTesting_ provider, but it can be applied to any of the components provided within the SDK. It will also work with normal React components.
+
+> <b>Examples</b><br/>
+> Record add to cart events, page views, searches, checkouts, and more.
+
+# <a name="withPathChange" class="anchor"></a>withPathChange
+
+This higher order component passes the `pathChange` prop to it's wrapped child, allowing for page view metrics to be associated with A/B test variations.
+
+## Props
+
+None
+
+## Provided Props
+
+Props passed to the wrapped component.
+
+<b>pathChange</b><br/>
+A function that can be used to track pageviews.
+
+```ts
+type PathChange = (pathname: string) => void;
+```
+
+## Usage
 
 ```js
-const MyComponent = componentExperiment(
-  {
-    a: lazy(() => import("./AComponent")),
-    b: lazy(() => import("./BComponent"))
-  },
-  {
-    queryName: "codeExperiment",
-    args: { experimentName: "example" },
-    field: "case",
-    wrappers: {
-      a: "span",
-      b: "h1"
-    },
-    wrapperProps: {
-      b: { style: { border: "5px solid red" } }
-    },
-    default: () => <div>Default</div>,
-    Loading: <div>Loading...</div>
+import { withPathChange } from "@digitaloptgroup/cms-react";
+
+class BlogPost extends React.Component {
+  componentDidMount() {
+    this.props.pathChange(this.props.location.pathname);
   }
-);
+  componentDidUpdate(prevProps) {
+    if (this.props.location.pathname !== prevProps.location.pathname) {
+      this.props.pathChange(this.props.location.pathname);
+    }
+  }
+  render() {
+    /*...*/
+  }
+}
+const BlogPostWithPageTracking = withPathChange(BlogPost);
 ```
 
-Server side data resolution and caching. If you are deploying your app into our Application Delivery Network you can provide a `routes.json` configuration file that will cache API data and inject into the page while still on the server. Completely eliminating client side data fetching latency.
+# <a name="withOutcome" class="anchor"></a>withOutcome
 
-```json
-{
-  "/": [
-    { "queryName": "helloWorld", "args": {} }
-    { "queryName": "codeExperiment", "args": { "name": "example" } }]
+This higher order component passes the `outcome` prop to it's wrapped child, allowing for custom outcomes to be associated with A/B test variations.
+
+## Props
+
+None
+
+## Provided Props
+
+Props passed to the wrapped component.
+
+<b>outcome</b><br/>
+A function that can be used to track custom outcomes. Any outcome can be used to evaluate a given A/B test.
+
+```ts
+type Metadata = Array<{ key: string; value: string }>;
+type Outcome = (name: string, metadata: Metadata) => void;
+```
+
+> <b>Naming Outcomes</b><br/>
+> We recommend picking and sticking with a consistent naming convention for outcomes. One that we like is the Object / Action naming convention. For example:
+
+- cartAddItem
+- cartRemoveItem
+- searchAddFilter
+- searchEnterPhrase
+- productView
+
+## Usage
+
+```js
+import { withOutcome } from "@digitaloptgroup/cms-react";
+
+class ProductItem extends React.Component {
+  cartAddItem = (sku, price) => {
+    const name = "cartAddItem";
+    const metadata = [
+      { key: "sku", value: sku },
+      { key: "price", value: price }
+    ];
+    this.props.outcome(name, metadata);
+  };
+  render() {
+    /*...*/
+  }
 }
+const ProductItemWithOutcome = withOutcome(ProductItem);
+```
+
+# <a name="withCaughtError" class="anchor"></a>withCaughtError
+
+This higher order component passes the `caughtError` prop to it's wrapped child, allowing for caught errors to be associated with A/B test variations. This can be useful for monitoring A/B tests and becoming notified of potential bugs or problems with a particular test variation.
+
+## Props
+
+None
+
+## Provided Props
+
+Props passed to the wrapped component.
+
+<b>caughtError</b><br/>
+A function that can be used to track errors your application catches.
+
+```ts
+type CaughtErrorMetadata = Array<{ key: string; value: string }>;
+type CaughtError = (metadata: CaughtErrorMetadata) => void;
+```
+
+## Usage
+
+```js
+import { withCaughtError } from "@digitaloptgroup/cms-react";
+
+class CartCheckout extends React.Component {
+  completeOrder = () => {
+    stripe.createSource(this.card).then(result => {
+      if (result.error) {
+        const metadata = [
+          { key: "location", value: "stripe.createSource" },
+          { key: "error", value: error.message }
+        ];
+        this.props.caughtError(metadata);
+        /* ... */
+      } else {
+        /*...*/
+      }
+    });
+  };
+  render() {
+    /*...*/
+  }
+}
+const CartCheckoutWithErrorReporting = withCaughtError(CartCheckout);
 ```
 
 ## Server side rendering
