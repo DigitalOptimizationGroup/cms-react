@@ -38,7 +38,6 @@ export class AbTesting extends React.Component {
     // only run this code in the browser
     if (typeof window !== "undefined") {
       const { initTracker } = require("@digitaloptgroup/analytics");
-      console.log("init tracker", initTracker);
       const {
         pathChange,
         outcome,
