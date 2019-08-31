@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 
 // fix this
 import { connect } from "@digitaloptgroup/cms/dist/es";
@@ -9,7 +9,7 @@ import {
   ExposureTracking
 } from "@digitaloptgroup/analytics";
 
-console.log("TS VERSION!");
+console.log("TS VERSION2!");
 
 interface AppConfig {
   rid?: string;
@@ -37,13 +37,14 @@ type Resolver = (options: {
 }) => void;
 
 type Props = AppConfig & {
-  apiUrl: string;
-  realtimeUrl: string;
-  ssrCache: {
+  projectId: string;
+  apiUrl?: string;
+  realtimeUrl?: string;
+  ssrCache?: {
     [key: string]: any;
   };
-  resolver: Resolver;
-  wsFqdn: string;
+  resolver?: Resolver;
+  wsFqdn?: string;
 };
 
 export class AbTesting extends React.Component<Props> {

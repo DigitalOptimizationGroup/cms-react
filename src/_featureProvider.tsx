@@ -1,16 +1,33 @@
-import * as React from "react";
+import React from "react";
+import { ReactElement } from "react";
 import { Context } from "./Context";
 import { isArgsEqual } from "./isArgsEqual";
+import { Track, Tracking } from "./Track";
 
-type Props = any;
+type FeatureRenderProps = {
+  isLoading: boolean;
+  variation: any;
+  tracking: Tracking;
+  error: { message: string; code: number };
+};
+
+type FeatureProviderProps = {
+  queryName: string;
+  args?: { [key: string]: string };
+  children: (props: FeatureRenderProps) => ReactElement;
+};
+
+type ConnectFeatureProps = FeatureProviderProps & {
+  cms: any;
+};
 
 export interface FeatureProvider {
-  Track?: any;
-  (props: any): React.ReactElement;
+  Track: typeof Track;
+  (props: FeatureProviderProps): ReactElement;
 }
 
 export const featureProvider = (WrappedComponent): FeatureProvider => {
-  class ConnectFeature extends React.Component<Props> {
+  class ConnectFeature extends React.Component<ConnectFeatureProps> {
     private subscription: any;
     state = {
       isLoading: true,
@@ -37,7 +54,7 @@ export const featureProvider = (WrappedComponent): FeatureProvider => {
       this.subscription && this.subscription.unsubscribe();
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: ConnectFeatureProps) {
       const { queryName, args } = this.props;
       // this check allows the subscribed feature to change when the args change
       // such as by the url changing but the component still being mounted
@@ -59,7 +76,11 @@ export const featureProvider = (WrappedComponent): FeatureProvider => {
       }
     }
 
-    subscribeToFeature = ({ cms, queryName, args = {} }: Props) => {
+    subscribeToFeature = ({
+      cms,
+      queryName,
+      args = {}
+    }: ConnectFeatureProps) => {
       return cms({
         queryName,
         args
@@ -107,8 +128,6 @@ export const featureProvider = (WrappedComponent): FeatureProvider => {
       );
     }
   }
-  return props => {
-    return (
       <Context.Consumer>
         {({ cms }) => {
           return <ConnectFeature cms={cms} {...props} />;
@@ -116,4 +135,8 @@ export const featureProvider = (WrappedComponent): FeatureProvider => {
       </Context.Consumer>
     );
   };
+
+  component.Track = Track;
+
+  return component;
 };

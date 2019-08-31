@@ -1,4 +1,5 @@
-import * as React from "react";
+import React from "react";
+import { FC, ReactElement } from "react";
 import { Context } from "./Context";
 
 type Props = {
@@ -63,7 +64,23 @@ class ConnectTrackExposure extends React.Component<Props> {
   }
 }
 
-export const Track = props => {
+export type Tracking = {
+  releaseId: string;
+  variationId: string;
+  featureId: string;
+  exposureId: string;
+  position: number;
+};
+
+type TrackRenderProps = {
+  trackingRef: unknown;
+};
+
+type TrackProps = Tracking & {
+  children: (props: TrackRenderProps) => ReactElement;
+};
+
+export const Track: FC<TrackProps> = props => {
   return (
     <Context.Consumer>
       {({ observe, unobserve }) => {

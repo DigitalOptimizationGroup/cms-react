@@ -4,7 +4,6 @@
   "description": "React SDK for Digital Optimization Group's Headless A/B Testing CMS",
   "repository": "https://github.com/DigitalOptimizationGroup/cms-react.git",
   "main": "dist/commonjs/index.js",
-  "module": "dist/es/index.js",
   "scripts": {
     "test": "jest --watch",
     "watch": "rollup -c -w",

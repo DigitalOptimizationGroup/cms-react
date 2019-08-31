@@ -1,31 +1,88 @@
-import { FC } from "react";
-import { featureProvider } from "./featureProvider";
-import { Track } from "./Track";
+import React from "react";
+import { useRef, useState, useEffect, ReactElement } from "react";
+import { unstable_batchedUpdates } from "react-dom";
+import { Observable } from "rxjs";
+import { isArgsEqual } from "./isArgsEqual";
+import { Context } from "./Context";
+import { Track, Tracking } from "./Track";
 
-type Props = {
-  variation: any;
-  tracking: {
-    releaseId: string;
-    variationId: string;
-    featureId: string;
-    exposureId: string;
-    position: number;
-  };
-  queryName: string;
-  args: { [key: string]: string };
+export class FeatureError extends Error {
+  code: number;
+
+  constructor(msg, code) {
+    super(msg);
+    this.name = "FeatureError";
+    this.code = code;
+  }
+}
+
+export type FeatureRenderProps<Variation> = {
   isLoading: boolean;
-  error: { message: string; code: number };
+  variation: Variation;
+  tracking: Tracking;
+  error: FeatureError;
 };
 
-const ConnectFeature: FC<Props> = ({
-  variation,
-  tracking,
-  queryName,
-  args,
-  isLoading,
-  error,
-  children
-}) => {
+type Query = {
+  queryName: string;
+  args?: { [key: string]: string };
+};
+
+type FeatureProps<Variation> = Query & {
+  children: (props: FeatureRenderProps<Variation>) => ReactElement;
+};
+
+type FeatureRecord<Variation> = { variation: Variation; tracking: Tracking };
+
+type FeatureWithContextProps<Variation> = FeatureProps<Variation> & {
+  cms: (query: Query) => Observable<FeatureRecord<Variation>>;
+};
+
+function memoizeArgs(args) {
+  const ref = useRef(null);
+
+  if (!ref.current || !isArgsEqual(ref.current, args)) {
+    ref.current = args;
+  }
+
+  return ref.current;
+}
+
+function FeatureWithContext<Variation>(
+  props: FeatureWithContextProps<Variation>
+) {
+  const { cms, queryName, args = {}, children } = props;
+  const [isLoading, setIsLoading] = useState(true);
+  const [feature, setFeature] = useState<FeatureRecord<Variation>>(null);
+  const [error, setError] = useState<FeatureError>(null);
+
+  useEffect(() => {
+    const sub = cms({
+      queryName,
+      args
+    }).subscribe({
+      next: feature => {
+        unstable_batchedUpdates(() => {
+          setIsLoading(false);
+          setFeature(feature);
+        });
+      },
+      error: e => {
+        unstable_batchedUpdates(() => {
+          setIsLoading(false);
+
+          if (e.status === 404) {
+            setError(new FeatureError("404 - Feature not found", 404));
+          } else {
+            setError(new FeatureError("500 - API Error", 500));
+          }
+        });
+      }
+    });
+
+    return () => sub.unsubscribe();
+  }, [cms, queryName, memoizeArgs(args)]);
+
   if (typeof children !== "function") {
     throw new Error(
       `The child of <Feature queryName="${queryName}"${
@@ -36,19 +93,16 @@ const ConnectFeature: FC<Props> = ({
     );
   }
 
-  if (isLoading || error) {
-    return children({ isLoading, variation, tracking, error });
-  } else {
-    return children({
-      variation,
-      tracking,
-      isLoading,
-      error
-    });
-  }
-};
-
-const Feature = featureProvider(ConnectFeature);
+  const { variation = null, tracking = null } = feature || {};
+  return children({ isLoading, variation, tracking, error });
+}
+function Feature<Variation = any>(props: FeatureProps<Variation>) {
+  return (
+    <Context.Consumer>
+      {({ cms }) => <FeatureWithContext cms={cms} {...props} />}
+    </Context.Consumer>
+  );
+}
 
 Feature.Track = Track;
 
