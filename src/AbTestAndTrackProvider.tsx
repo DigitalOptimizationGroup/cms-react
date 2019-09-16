@@ -4,12 +4,10 @@ import React from "react";
 import { connect } from "@digitaloptgroup/cms/dist/es";
 import { Context } from "./Context";
 import {
-  initTracker,
+  //initTracker,
   Trackers,
   ExposureTracking
 } from "@digitaloptgroup/analytics";
-
-console.log("TS VERSION2!");
 
 interface AppConfig {
   rid?: string;
