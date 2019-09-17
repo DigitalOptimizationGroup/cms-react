@@ -17,12 +17,22 @@ export class FeatureError extends Error {
   }
 }
 
-export type FeatureRenderProps<Variation> = {
-  isLoading: boolean;
+export type FeatureResult<Variation> = {
   variation: Variation;
   tracking: Tracking;
-  error: FeatureError;
 };
+
+export type FeatureRenderProps<Variation> =
+  | {
+      isLoading: true;
+      error: null;
+      feature: FeatureResult<Variation> | null;
+    }
+  | {
+      isLoading: false;
+      error: FeatureError | null;
+      feature: FeatureResult<Variation> | null;
+    };
 
 type Query = {
   queryName: string;
@@ -129,12 +139,7 @@ export interface FeatureProvider<Variation> {
   (props: FeatureProviderProps<Variation>): ReactElement;
 }
 
-type State<Variation> = {
-  isLoading: boolean;
-  variation?: Variation;
-  tracking?: Tracking;
-  error?: FeatureError;
-};
+type State<Variation> = FeatureRenderProps<Variation>;
 
 class FeatureWithContext<Variation> extends React.Component<
   FeatureWithContextProps<Variation>,
@@ -143,9 +148,8 @@ class FeatureWithContext<Variation> extends React.Component<
   private subscription: Subscription;
   state: State<Variation> = {
     isLoading: true,
-    variation: null,
-    tracking: null,
-    error: null
+    error: null,
+    feature: null
   };
 
   componentWillMount() {
@@ -199,8 +203,7 @@ class FeatureWithContext<Variation> extends React.Component<
       next: feature => {
         this.setState({
           isLoading: false,
-          variation: feature.variation,
-          tracking: feature.tracking
+          feature
         });
       },
       error: e => {
@@ -220,15 +223,24 @@ class FeatureWithContext<Variation> extends React.Component<
   };
 
   render() {
-    const { error, variation, tracking, isLoading } = this.state;
+    const { isLoading, error, feature } = this.state;
     const { children } = this.props;
 
-    return children({
-      isLoading,
-      variation,
-      tracking,
-      error
-    });
+    // TypeScript can't infer this descriminated union correctly because
+    // we're destructuring so we have to add a manual check and the error: null
+    if (isLoading === true) {
+      return children({
+        isLoading,
+        error: null,
+        feature
+      });
+    } else {
+      return children({
+        isLoading,
+        error,
+        feature
+      });
+    }
   }
 }
 

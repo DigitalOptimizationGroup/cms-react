@@ -2,20 +2,28 @@ import React from "react";
 import { FC, ReactElement } from "react";
 import { Context } from "./Context";
 
+type TrackRenderProps<RefElement extends Element> = {
+  trackingRef: (node: RefElement) => void;
+};
+
+type TrackRenderFunction<RefElement extends Element> = (
+  props: TrackRenderProps<RefElement>
+) => ReactElement;
+
 type Props = {
   children: (any) => any;
-  unobserve: any;
-  observe: any;
-  releaseId: any;
-  featureId: any;
-  variationId: any;
-  exposureId: any;
+  unobserve: (node: Element) => void;
+  observe: (node: Element, options: any) => void;
+  releaseId: string;
+  featureId: string;
+  variationId: string;
+  exposureId: string;
 };
 
 class ConnectTrackExposure extends React.Component<Props> {
   trackedElement: Element;
 
-  forwardedRef = node => {
+  forwardedRef = (node: Element) => {
     if (this.trackedElement) {
       this.props.unobserve(this.trackedElement);
     }
@@ -72,15 +80,13 @@ export type Tracking = {
   position: number;
 };
 
-type TrackRenderProps = {
-  trackingRef: unknown;
+type TrackProps<RefElement extends Element> = Tracking & {
+  children: TrackRenderFunction<RefElement>;
 };
 
-type TrackProps = Tracking & {
-  children: (props: TrackRenderProps) => ReactElement;
-};
-
-export const Track: FC<TrackProps> = props => {
+export function Track<RefElement extends Element = any>(
+  props: TrackProps<RefElement>
+) {
   return (
     <Context.Consumer>
       {({ observe, unobserve }) => {
@@ -94,4 +100,4 @@ export const Track: FC<TrackProps> = props => {
       }}
     </Context.Consumer>
   );
-};
+}
