@@ -82,7 +82,6 @@ export class AbTesting extends React.Component<Props> {
     // only run this code in the browser
     if (typeof window !== "undefined") {
       const { initTracker } = require("@digitaloptgroup/analytics");
-      console.log("init tracker", initTracker);
       this.trackers = initTracker(
         {
           rid: this.props.rid || cmsConfig.rid,

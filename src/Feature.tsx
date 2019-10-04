@@ -136,7 +136,7 @@ type ConnectFeatureProps<Variation> = FeatureProviderProps<Variation> & {
 
 export interface FeatureProvider<Variation> {
   Track: typeof Track;
-  (props: FeatureProviderProps<Variation>): ReactElement;
+  (props: FeatureProviderProps<Variation>): Element | Element[] | null;
 }
 
 type State<Variation> = FeatureRenderProps<Variation>;
@@ -153,6 +153,7 @@ class FeatureWithContext<Variation> extends React.Component<
   };
 
   componentWillMount() {
+    console.log("Component Will MOUnt");
     // if server
     // do the stuff
     // embed the data into the worker so we can be sync here
@@ -207,6 +208,7 @@ class FeatureWithContext<Variation> extends React.Component<
         });
       },
       error: e => {
+        console.log(e);
         if (e.status === 404) {
           this.setState({
             isLoading: false,
@@ -215,7 +217,7 @@ class FeatureWithContext<Variation> extends React.Component<
         } else {
           this.setState({
             isLoading: false,
-            error: new FeatureError("500 - API Error", 500)
+            error: new FeatureError("500 - API Error " + JSON.stringify(e), 500)
           });
         }
       }
@@ -243,7 +245,6 @@ class FeatureWithContext<Variation> extends React.Component<
     }
   }
 }
-
 // this could probably use the useContext hook
 // const {cms} = useContext(Context)
 function Feature<Variation = any>(props: FeatureProps<Variation>) {

@@ -40,6 +40,14 @@ class ConnectTrackExposure extends React.Component<Props> {
     }
   };
 
+  componentWillMount() {
+    if (typeof this.props.children !== "function") {
+      throw new Error(
+        `<Feature.Track /> was not passed a single function as a child.`
+      );
+    }
+  }
+
   componentDidMount() {
     // maybe these should be console.warn & don't set up the tracking
     if (!this.trackedElement) {
