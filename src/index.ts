@@ -4,7 +4,11 @@ export { Tracking } from "./Track";
 export { withCaughtError } from "./withCaughtError";
 export { withOutcome } from "./withOutcome";
 export { withPathChange } from "./withPathChange";
-export { registerRenderer, isEdge } from "@digitaloptgroup/cms/dist/es";
+export {
+  registerRenderer,
+  isEdge,
+  getEdgeInfo
+} from "@digitaloptgroup/cms/dist/es";
 export { edgeLoadable } from "./edgeLoadable";
 
 export type Image = {
