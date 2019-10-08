@@ -40,7 +40,9 @@ type Query = {
 };
 
 type FeatureProps<Variation> = Query & {
-  children: (props: FeatureRenderProps<Variation>) => ReactElement;
+  children: (
+    props: FeatureRenderProps<Variation>
+  ) => ReactElement | ReactElement[] | null;
 };
 
 type FeatureRecord<Variation> = { variation: Variation; tracking: Tracking };
@@ -71,7 +73,12 @@ type ConnectFeatureProps<Variation> = FeatureProviderProps<Variation> & {
 
 export interface FeatureProvider<Variation> {
   Track: typeof Track;
-  (props: FeatureProviderProps<Variation>): Element | Element[] | null;
+  (props: FeatureProviderProps<Variation>):
+    | Element
+    | Element[]
+    // | ReactElement
+    // | ReactElement[]
+    | null;
 }
 
 type State<Variation> = FeatureRenderProps<Variation>;
