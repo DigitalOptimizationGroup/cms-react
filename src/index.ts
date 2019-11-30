@@ -5,9 +5,12 @@ export { withCaughtError } from "./withCaughtError";
 export { withOutcome } from "./withOutcome";
 export { withPathChange } from "./withPathChange";
 export {
+  registerRoot,
   registerRenderer,
   isEdge,
-  getEdgeInfo
+  getEdgeInfo,
+  __EXPERIMENTAL__registerCacheLoader,
+  __EXPERIMENTAL__getFromCache
 } from "@digitaloptgroup/cms/dist/es";
 export { edgeLoadable } from "./edgeLoadable";
 
@@ -21,4 +24,4 @@ export type Image = {
   url: string;
   width: number;
 };
-console.log("V1.1");
+console.log("UPDATED - 1.1.3");

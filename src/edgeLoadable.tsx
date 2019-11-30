@@ -4,7 +4,8 @@ import React, { Component } from "react";
 
 export function edgeLoadable(options) {
   const loader = {
-    path: null,
+    scriptPaths: null,
+    linkPaths: null,
     loader: options.loader,
     Component: null
   };
@@ -20,7 +21,11 @@ export function edgeLoadable(options) {
 
     componentWillMount() {
       if (loader.Component) {
-        __DOG_WORKER__.usedScriptPaths.push(loader.path);
+        if (typeof __DOG_WORKER__ !== "undefined") {
+          __DOG_WORKER__.usedScriptPaths.push(...loader.scriptPaths);
+          __DOG_WORKER__.usedLinkPaths.push(...loader.linkPaths);
+        }
+
         this.setState({
           Component: loader.Component
         });

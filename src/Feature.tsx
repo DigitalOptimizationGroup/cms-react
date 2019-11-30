@@ -1,5 +1,5 @@
 import React from "react";
-import { useRef, useState, useEffect, ReactElement } from "react";
+import { useRef, useState, useEffect, ReactNode } from "react";
 import { unstable_batchedUpdates, render } from "react-dom";
 import { Observable } from "rxjs";
 import { isArgsEqual } from "./isArgsEqual";
@@ -40,9 +40,7 @@ type Query = {
 };
 
 type FeatureProps<Variation> = Query & {
-  children: (
-    props: FeatureRenderProps<Variation>
-  ) => ReactElement | ReactElement[] | null;
+  children: (props: FeatureRenderProps<Variation>) => ReactNode;
 };
 
 type FeatureRecord<Variation> = { variation: Variation; tracking: Tracking };
@@ -64,7 +62,7 @@ function memoizeArgs(args) {
 type FeatureProviderProps<Variation> = {
   queryName: string;
   args?: { [key: string]: string };
-  children: (props: FeatureRenderProps<Variation>) => ReactElement;
+  children: (props: FeatureRenderProps<Variation>) => ReactNode;
 };
 
 type ConnectFeatureProps<Variation> = FeatureProviderProps<Variation> & {
@@ -73,12 +71,7 @@ type ConnectFeatureProps<Variation> = FeatureProviderProps<Variation> & {
 
 export interface FeatureProvider<Variation> {
   Track: typeof Track;
-  (props: FeatureProviderProps<Variation>):
-    | Element
-    | Element[]
-    // | ReactElement
-    // | ReactElement[]
-    | null;
+  (props: FeatureProviderProps<Variation>): ReactNode;
 }
 
 type State<Variation> = FeatureRenderProps<Variation>;
