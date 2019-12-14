@@ -9,6 +9,7 @@ export {
   registerRenderer,
   isEdge,
   getEdgeInfo,
+  edgeInfo,
   __EXPERIMENTAL__registerCacheLoader,
   __EXPERIMENTAL__getFromCache
 } from "@digitaloptgroup/cms/dist/es";
